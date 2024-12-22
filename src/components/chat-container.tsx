@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import Message from "./message";
@@ -33,6 +33,7 @@ interface Message {
 
 interface ChatContainerProps {
   channel: string;
+  uniqueMessages: { id: string; content: string; createdAt: string; user: { username: string } }[];
 }
 
 const formSchema = z.object({
@@ -49,6 +50,19 @@ const ChatContainer = ({ channel }: ChatContainerProps) => {
   const [isCurrentlyTyping, setIsCurrentlyTyping] = useState(false);
   const [user, setUser] = useState<{ id: string; username: string } | null>(null);
   const [clientId] = useState(() => Math.random().toString(36).substr(2, 9));
+  const chatEndRef = useRef<HTMLDivElement | null>(null); // Explicitly type the ref
+
+  const uniqueMessages = messages.filter((message, index, self) =>
+    index === self.findIndex((m) => m.id === message.id)
+  );
+
+  const scrollToBottom = () => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [uniqueMessages]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -159,9 +173,6 @@ const ChatContainer = ({ channel }: ChatContainerProps) => {
     };
   }, [channel, clientId]);
 
-  const uniqueMessages = messages.filter((message, index, self) =>
-    index === self.findIndex((m) => m.id === message.id)
-  );
 
   return (
     <div className="h-full flex flex-col justify-end">
@@ -180,6 +191,8 @@ const ChatContainer = ({ channel }: ChatContainerProps) => {
               />
             ))
           )}
+          {/* Dummy div to ensure scrolling works */}
+          <div ref={chatEndRef} />
         </div>
       </div>
       <div className="flex flex-col p-4">
