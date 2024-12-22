@@ -2,6 +2,7 @@ import { db } from "@/lib/db"
 import Link from "next/link"
 import type { Channel } from "@/types"
 import { Hash } from "lucide-react"
+export const dynamic = 'force-dynamic'
 
 export default async function Home() {
   const channels = await db.channel.findMany({
@@ -9,8 +10,6 @@ export default async function Home() {
       createdAt: 'desc'
     }
   }) satisfies Channel[]
-
-  console.log(channels)
 
   return (
     <div className="min-h-screen min-w-screen font-[family-name:var(--font-geist-sans)]">
