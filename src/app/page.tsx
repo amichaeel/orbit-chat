@@ -19,8 +19,8 @@ export default async function Home() {
           ) : (
             channels.map((channel: Channel) => (
               <Link
-                key={channel.id}
-                href={`/channel/${channel.id}`}
+                key={channel.name}
+                href={`/channel/${channel.name}`}
                 className="flex items-center gap-2 p-3 rounded-lg hover:bg-muted transition-colors"
               >
                 <Hash className="h-4 w-4 text-muted-foreground" />
