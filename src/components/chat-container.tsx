@@ -23,9 +23,12 @@ interface Message {
   id: string;
   content: string;
   createdAt: Date;
-  channelId: string;  // Changed from channel to channelId to match DB
+  channelId: string;
   userId: string;
-  updatedAt: Date;   // Added this as it's in the DB schema
+  updatedAt: Date;
+  user: {
+    username: string;
+  }
 }
 
 interface ChatContainerProps {
@@ -41,8 +44,10 @@ const TYPING_TIMEOUT = 5000;
 const ChatContainer = ({ channel }: ChatContainerProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
+  const [typingUser, setTypingUser] = useState<string | null>(null);  // Add this state
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout>();
   const [isCurrentlyTyping, setIsCurrentlyTyping] = useState(false);
+  const [user, setUser] = useState<{ id: string; username: string } | null>(null);
   const [clientId] = useState(() => Math.random().toString(36).substr(2, 9));
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -52,14 +57,12 @@ const ChatContainer = ({ channel }: ChatContainerProps) => {
     }
   })
 
-
-
   const sendMessageHandler = async (values: z.infer<typeof formSchema>) => {
-    if (!values.message.trim()) return;
+    if (!values.message.trim() || !user) return;
 
     try {
-      await sendMessage(values.message, channel);
-      await sendTypingIndicator(false, clientId, channel);
+      await sendMessage(values.message, channel, user); // Pass user data
+      await sendTypingIndicator(false, clientId, channel, user.username); // Pass username
       setIsCurrentlyTyping(false);
       form.reset();
     } catch (error) {
@@ -68,19 +71,17 @@ const ChatContainer = ({ channel }: ChatContainerProps) => {
   }
 
   const handleTyping = async () => {
-    if (isCurrentlyTyping) {
-      return;
-    }
+    if (isCurrentlyTyping || !user) return;
 
     setIsCurrentlyTyping(true);
-    await sendTypingIndicator(true, clientId, channel);
+    await sendTypingIndicator(true, clientId, channel, user.username);
 
     if (typingTimeout) {
       clearTimeout(typingTimeout);
     }
 
     const timeout = setTimeout(async () => {
-      await sendTypingIndicator(false, clientId, channel);
+      await sendTypingIndicator(false, clientId, channel, user.username);
       setIsCurrentlyTyping(false);
     }, TYPING_TIMEOUT);
 
@@ -101,35 +102,46 @@ const ChatContainer = ({ channel }: ChatContainerProps) => {
   }, [channel]);
 
   useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await fetch('/api/auth/me');
+        if (response.ok) {
+          const userData = await response.json();
+          setUser(userData);
+        }
+      } catch (error) {
+        console.error('Failed to fetch user:', error);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  useEffect(() => {
     const channelName = `channel-${channel}`;
     pusherClient.subscribe(channelName);
 
-    pusherClient.bind("upcoming-message", (data: {
-      message: string;
-      messageId: string;
-      timestamp: string;
-      userId: string;
-    }) => {
-      const newMessage: Message = {
-        id: data.messageId,
-        content: data.message,
-        createdAt: new Date(data.timestamp),
-        channelId: channel,
-        userId: data.userId,
-        updatedAt: new Date(data.timestamp)
-      };
-
+    pusherClient.bind("upcoming-message", (data: Message) => {
       setMessages((prev) => {
-        if (prev.some(msg => msg.id === newMessage.id)) {
+        if (prev.some(msg => msg.id === data.id)) {
           return prev;
         }
-        return [...prev, newMessage];
+        return [...prev, {
+          ...data,
+          createdAt: new Date(data.createdAt),
+          updatedAt: new Date(data.updatedAt)
+        }];
       });
     });
 
-    pusherClient.bind('typing-indicator', (data: { isTyping: boolean; clientId: string }) => {
+    pusherClient.bind('typing-indicator', (data: {
+      isTyping: boolean;
+      clientId: string;
+      username: string;
+    }) => {
       if (data.clientId !== clientId) {
         setIsTyping(data.isTyping);
+        setTypingUser(data.isTyping ? data.username : null);
         if (data.isTyping) {
           const timeout = setTimeout(() => {
             setIsTyping(false);
@@ -164,7 +176,7 @@ const ChatContainer = ({ channel }: ChatContainerProps) => {
                 key={message.id}
                 message={message.content}
                 timestamp={message.createdAt}
-                userId={message.userId}
+                username={message.user.username}
               />
             ))
           )}
@@ -173,7 +185,7 @@ const ChatContainer = ({ channel }: ChatContainerProps) => {
       <div className="flex flex-col p-4">
         {isTyping && (
           <div className="text-sm items-center pb-2 text-gray-500 animate-pulse">
-            Someone is typing...
+            {typingUser} is typing...
           </div>
         )}
         <Form {...form}>

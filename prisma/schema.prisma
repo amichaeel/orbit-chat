@@ -7,6 +7,16 @@ datasource db {
   url      = env("POSTGRES_PRISMA_URL")
 }
 
+model User {
+  id        String    @id @default(cuid())
+  username  String    @unique
+  email     String    @unique
+  password  String
+  messages  Message[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
 model Channel {
   id          String    @id @default(cuid())
   name        String
@@ -21,7 +31,8 @@ model Message {
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  channelId String
   channel   Channel  @relation(fields: [channelId], references: [id])
+  channelId String
+  user      User     @relation(fields: [userId], references: [id]) // Added this relation
   userId    String
 }

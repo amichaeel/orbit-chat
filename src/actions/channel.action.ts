@@ -25,7 +25,6 @@ export const getChannels = async () => {
       },
     });
     return channels;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     throw new Error(error.message);
   }
@@ -36,6 +35,13 @@ export const getChannelMessages = async (channelId: string) => {
     const messages = await db.message.findMany({
       where: {
         channelId,
+      },
+      include: {
+        user: {
+          select: {
+            username: true
+          }
+        }
       },
       orderBy: {
         createdAt: 'asc',
