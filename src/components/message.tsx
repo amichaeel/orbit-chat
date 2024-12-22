@@ -13,7 +13,7 @@ const Message = ({ message, timestamp, username }: MessageProps) => {
           {timestamp.toLocaleTimeString()}
         </span>
       </div>
-      <p>{message}</p>
+      <p className="text-sm break-words">{message}</p>
     </div>
   );
 };
