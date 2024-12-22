@@ -175,9 +175,9 @@ const ChatContainer = ({ channel }: ChatContainerProps) => {
 
   return (
     <div className="h-full flex flex-col justify-end">
-      <div className="flex-1 overflow-y-auto p-4 flex flex-col">
+      <div className="flex-1 overflow-y-auto flex flex-col">
         <div className="flex-1" />
-        <div className="flex flex-col gap-y-4">
+        <div className="flex flex-col">
           {!uniqueMessages.length ? (
             <div className="text-center text-gray-500">No messages yet</div>
           ) : (
@@ -214,6 +214,7 @@ const ChatContainer = ({ channel }: ChatContainerProps) => {
                         field.onChange(e);
                         handleTyping();
                       }}
+                      className="text-xs"
                     />
                   </FormControl>
                 </FormItem>
