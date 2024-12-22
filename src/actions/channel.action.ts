@@ -2,18 +2,26 @@
 "use server";
 
 import { db } from "@/lib/db";
+import { z } from "zod"
 
-export const createChannel = async (name: string, description?: string) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const channelSchema = z.object({
+  name: z.string().min(1).max(50),
+  description: z.string().optional()
+})
+
+export const createChannel = async (data: z.infer<typeof channelSchema>) => {
   try {
     const channel = await db.channel.create({
       data: {
-        name,
-        description,
-      },
-    });
-    return channel;
-  } catch (error: any) {
-    throw new Error(error.message);
+        name: data.name,
+        description: data.description
+      }
+    })
+    return { success: true, channel }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    return { success: false, error: "Failed to create channel" }
   }
 }
 

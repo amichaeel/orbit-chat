@@ -3,7 +3,7 @@
 import { ThemeToggle } from "./theme-toggle"
 import { Button } from "./ui/button"
 import Search from "./search"
-import { LogOut, User, Plus } from "lucide-react"
+import { LogOut, User } from "lucide-react"
 import Link from "next/link"
 import {
   DropdownMenu,
@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/context/auth-context"
+import { CreateChannelDialog } from "./create-channel-dialog"
+
 
 const Nav = () => {
   const router = useRouter()
@@ -36,17 +38,14 @@ const Nav = () => {
         </Link>
       </div>
 
-      <div className="justify-self-center">
+      <div className="justify-self-center w-full">
         <Search />
       </div>
 
       <div className="flex items-center justify-self-end gap-2">
         {user ? (
           <>
-            <Button disabled variant={"outline"}>
-              <Plus />
-              <span className="text-sm">Create Channel</span>
-            </Button>
+            <CreateChannelDialog />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon">

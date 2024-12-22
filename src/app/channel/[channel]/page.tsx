@@ -3,28 +3,18 @@ import ChatContainer from "@/components/chat-container"
 import { db } from "@/lib/db"
 import { notFound } from "next/navigation"
 
-interface PageProps {
-  params: Promise<{
-    channel: string
-  }>
-}
-
-const ChannelPage = async ({ params }: PageProps) => {
-  const { channel } = await params
-
-  const channelData = await db.channel.findUnique({
-    where: {
-      id: channel
-    }
+const ChannelPage = async ({ params }: { params: { channel: string } }) => {
+  const channel = await db.channel.findUnique({
+    where: { name: params.channel }
   })
 
-  if (!channelData) {
+  if (!channel) {
     notFound()
   }
 
   return (
     <div className="flex-1 min-h-0">
-      <ChatContainer channel={channelData.id} />
+      <ChatContainer channel={channel.name} />
     </div>
   )
 }
