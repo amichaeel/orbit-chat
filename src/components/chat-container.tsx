@@ -33,7 +33,6 @@ interface Message {
 
 interface ChatContainerProps {
   channel: string;
-  uniqueMessages: { id: string; content: string; createdAt: string; user: { username: string } }[];
 }
 
 const formSchema = z.object({
@@ -45,12 +44,12 @@ const TYPING_TIMEOUT = 5000;
 const ChatContainer = ({ channel }: ChatContainerProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
-  const [typingUser, setTypingUser] = useState<string | null>(null);  // Add this state
+  const [typingUser, setTypingUser] = useState<string | null>(null);
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout>();
   const [isCurrentlyTyping, setIsCurrentlyTyping] = useState(false);
   const [user, setUser] = useState<{ id: string; username: string } | null>(null);
   const [clientId] = useState(() => Math.random().toString(36).substr(2, 9));
-  const chatEndRef = useRef<HTMLDivElement | null>(null); // Explicitly type the ref
+  const chatEndRef = useRef<HTMLDivElement | null>(null);
 
   const uniqueMessages = messages.filter((message, index, self) =>
     index === self.findIndex((m) => m.id === message.id)
@@ -191,7 +190,6 @@ const ChatContainer = ({ channel }: ChatContainerProps) => {
               />
             ))
           )}
-          {/* Dummy div to ensure scrolling works */}
           <div ref={chatEndRef} />
         </div>
       </div>
