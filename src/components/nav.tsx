@@ -31,21 +31,25 @@ const Nav = () => {
   }
 
   return (
-    <div className="grid grid-cols-3 border-b items-center w-full px-4 py-2">
-      <div className="justify-self-start">
+    <div className="grid grid-cols-[1fr,auto,auto] md:grid-cols-[1fr,2fr,1fr] border-b items-center w-full px-4 py-2">
+      <div>
         <Link href="/">
           <span className="text-2xl font-extralight">orbit</span>
         </Link>
       </div>
 
-      <div className="justify-self-center w-full">
-        <Search />
+      <div className="hidden md:flex justify-center w-full">
+        <div className="w-full max-w-xl">
+          <Search />
+        </div>
       </div>
 
-      <div className="flex items-center justify-self-end gap-2">
+      <div className="flex items-center ml-auto gap-2">
         {user ? (
           <>
-            <CreateChannelDialog />
+            <div className="hidden lg:block">
+              <CreateChannelDialog />
+            </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon">
@@ -58,6 +62,9 @@ const Nav = () => {
                   <p className="text-xs text-muted-foreground">{user.email}</p>
                 </div>
                 <DropdownMenuSeparator />
+                <div className="lg:hidden">
+                  <CreateChannelDialog />
+                </div>
                 <DropdownMenuItem
                   className="text-red-600 cursor-pointer"
                   onClick={handleLogout}

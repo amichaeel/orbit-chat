@@ -74,8 +74,8 @@ const ChatContainer = ({ channel }: ChatContainerProps) => {
     if (!values.message.trim() || !user) return;
 
     try {
-      await sendMessage(values.message, channel, user); // Pass user data
-      await sendTypingIndicator(false, clientId, channel, user.username); // Pass username
+      await sendMessage(values.message, channel, user);
+      await sendTypingIndicator(false, clientId, channel, user.username);
       setIsCurrentlyTyping(false);
       form.reset();
     } catch (error) {
@@ -170,7 +170,7 @@ const ChatContainer = ({ channel }: ChatContainerProps) => {
       pusherClient.unbind("upcoming-message");
       pusherClient.unbind("typing-indicator");
     };
-  }, [channel, clientId]);
+  }, [channel]);
 
 
   return (
@@ -214,7 +214,7 @@ const ChatContainer = ({ channel }: ChatContainerProps) => {
                         field.onChange(e);
                         handleTyping();
                       }}
-                      className="text-xs"
+                      className="md:text-xs text-base"
                     />
                   </FormControl>
                 </FormItem>

@@ -1,6 +1,7 @@
 import ChatContainer from "@/components/chat-container";
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
+import { ChannelHeader } from "@/components/channel-header";
 
 type Params = Promise<{ channel: string }>;
 
@@ -21,8 +22,11 @@ const ChannelPage = async ({ params }: ChannelPageProps) => {
   }
 
   return (
-    <div className="flex-1 min-h-0">
-      <ChatContainer channel={channel.id} />
+    <div className="flex flex-col h-full overflow-hidden"> {/* Changed classes */}
+      <ChannelHeader name={channel.name} description={channel.description} />
+      <div className="flex-1 overflow-hidden"> {/* Added wrapper */}
+        <ChatContainer channel={channel.id} />
+      </div>
     </div>
   );
 };
