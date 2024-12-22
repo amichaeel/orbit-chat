@@ -1,27 +1,30 @@
-import ChatContainer from "@/components/chat-container"
-import { db } from "@/lib/db"
-import { notFound } from "next/navigation"
+import ChatContainer from "@/components/chat-container";
+import { db } from "@/lib/db";
+import { notFound } from "next/navigation";
 
-interface PageProps {
-  params: {
-    channel: string
-  }
+type Params = Promise<{ channel: string }>;
+
+interface ChannelPageProps {
+  params: Params;
 }
 
-async function ChannelPage({ params }: PageProps) {
+const ChannelPage = async ({ params }: ChannelPageProps) => {
+  const resolvedParams = await params;
   const channel = await db.channel.findUnique({
-    where: { name: params.channel }
-  })
+    where: {
+      name: resolvedParams.channel,
+    },
+  });
 
   if (!channel) {
-    notFound()
+    notFound();
   }
 
   return (
     <div className="flex-1 min-h-0">
-      <ChatContainer channel={channel.name} />
+      <ChatContainer channel={channel.id} />
     </div>
-  )
-}
+  );
+};
 
-export default ChannelPage
+export default ChannelPage;
