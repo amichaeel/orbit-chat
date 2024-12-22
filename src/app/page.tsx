@@ -1,7 +1,7 @@
 import { db } from "@/lib/db"
 import Link from "next/link"
-import { Hash } from "lucide-react"
 import type { Channel } from "@/types"
+import { Hash } from "lucide-react"
 
 export default async function Home() {
   const channels = await db.channel.findMany({
@@ -9,6 +9,8 @@ export default async function Home() {
       createdAt: 'desc'
     }
   }) satisfies Channel[]
+
+  console.log(channels)
 
   return (
     <div className="min-h-screen min-w-screen font-[family-name:var(--font-geist-sans)]">
@@ -19,7 +21,7 @@ export default async function Home() {
           ) : (
             channels.map((channel: Channel) => (
               <Link
-                key={channel.name}
+                key={channel.id}
                 href={`/channel/${channel.name}`}
                 className="flex items-center gap-2 p-3 rounded-lg hover:bg-muted transition-colors"
               >
