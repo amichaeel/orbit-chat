@@ -3,13 +3,13 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import Message from "./message";
-
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Send } from "lucide-react";
 import { pusherClient } from "@/lib/pusher";
-import { sendMessage } from "@/actions/message.action";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { sendMessage } from "@/actions/message.action";
+import { sendTypingIndicator } from "@/actions/typing.action";
 
 import {
   Form,
@@ -22,8 +22,13 @@ const formSchema = z.object({
   message: z.string()
 })
 
+const TYPING_TIMEOUT = 20000;
+
 const ChatContainer = () => {
   const [messages, setMessages] = useState<string[]>([]);
+  const [isTyping, setIsTyping] = useState(false);
+  const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout>();
+  const [clientId] = useState(() => Math.random().toString(36).substr(2, 9));
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -33,9 +38,30 @@ const ChatContainer = () => {
   })
 
   const sendMessageHandler = async (values: z.infer<typeof formSchema>) => {
-    await sendMessage(values.message);
-    form.reset();
+    if (!values.message.trim()) return;
+
+    try {
+      await sendMessage(values.message);
+      await sendTypingIndicator(false, clientId);
+      form.reset();
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
   }
+
+  const handleTyping = async () => {
+    if (typingTimeout) {
+      clearTimeout(typingTimeout);
+    }
+
+    await sendTypingIndicator(true, clientId);
+
+    const timeout = setTimeout(async () => {
+      await sendTypingIndicator(false, clientId);
+    }, TYPING_TIMEOUT);
+
+    setTypingTimeout(timeout);
+  };
 
   const uniqueMessages = messages.filter((value, index, self) => self.indexOf(value) === index);
 
@@ -47,7 +73,24 @@ const ChatContainer = () => {
       setMessages((prev) => [...prev, data.message]);
     });
 
-    return () => pusherClient.unsubscribe("global");
+    pusherClient.bind('typing-indicator', (data: { isTyping: boolean, clientId: string }) => {
+      if (data.clientId !== clientId) {
+        setIsTyping(data.isTyping);
+        if (data.isTyping) {
+          const timeout = setTimeout(() => {
+            setIsTyping(false);
+          }, TYPING_TIMEOUT);
+
+          return () => clearTimeout(timeout);
+        }
+      }
+    });
+
+    return () => {
+      pusherClient.unsubscribe("global");
+      pusherClient.unbind("upcoming-message");
+      pusherClient.unbind("typing-indicator");
+    };
   }, []);
 
   return (
@@ -62,7 +105,12 @@ const ChatContainer = () => {
             ))
           )}
         </div>
-        <div className="p-4 ">
+        <div className="p-1">
+          {isTyping && (
+            <div className="text-sm text-gray-500 animate-pulse">
+              Someone is typing...
+            </div>
+          )}
           <Form {...form}>
             <form onSubmit={form.handleSubmit(sendMessageHandler)} className="flex gap-2">
               <FormField
@@ -74,6 +122,10 @@ const ChatContainer = () => {
                       <Input
                         placeholder="Say something..."
                         {...field}
+                        onChange={(e) => {
+                          field.onChange(e);
+                          handleTyping();
+                        }}
                       />
                     </FormControl>
                   </FormItem>
