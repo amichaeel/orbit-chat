@@ -22,12 +22,13 @@ const formSchema = z.object({
   message: z.string()
 })
 
-const TYPING_TIMEOUT = 20000;
+const TYPING_TIMEOUT = 5000;
 
 const ChatContainer = () => {
   const [messages, setMessages] = useState<string[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout>();
+  const [isCurrentlyTyping, setIsCurrentlyTyping] = useState(false);
   const [clientId] = useState(() => Math.random().toString(36).substr(2, 9));
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -43,6 +44,7 @@ const ChatContainer = () => {
     try {
       await sendMessage(values.message);
       await sendTypingIndicator(false, clientId);
+      setIsCurrentlyTyping(false);
       form.reset();
     } catch (error) {
       console.error("Error sending message:", error);
@@ -50,14 +52,20 @@ const ChatContainer = () => {
   }
 
   const handleTyping = async () => {
+    if (isCurrentlyTyping) {
+      return;
+    }
+
+    setIsCurrentlyTyping(true);
+    await sendTypingIndicator(true, clientId);
+
     if (typingTimeout) {
       clearTimeout(typingTimeout);
     }
 
-    await sendTypingIndicator(true, clientId);
-
     const timeout = setTimeout(async () => {
       await sendTypingIndicator(false, clientId);
+      setIsCurrentlyTyping(false);
     }, TYPING_TIMEOUT);
 
     setTypingTimeout(timeout);
@@ -91,7 +99,7 @@ const ChatContainer = () => {
       pusherClient.unbind("upcoming-message");
       pusherClient.unbind("typing-indicator");
     };
-  }, []);
+  }, [clientId]);
 
   return (
     <div className="fixed inset-0">
