@@ -1,15 +1,24 @@
 "use server";
 
 import { pusherServer } from "@/lib/pusher";
+import { db } from "@/lib/db";
 
-export const sendMessage = async (message: string) => {
+export const sendMessage = async (message: string, channelId: string) => {
   try {
-    // TODO: store message inside database
-
-    // trigger websocket event
-    pusherServer.trigger('global', 'upcoming-message', {
-      message,
+    const newMessage = await db.message.create({
+      data: {
+        content: message,
+        channelId,
+        userId: "anonymous",
+      },
     })
+
+    await pusherServer.trigger(`channel-${channelId}`, 'upcoming-message', {
+      message,
+      messageId: newMessage.id,
+      timestamp: newMessage.createdAt,
+      userId: newMessage.userId
+    });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {

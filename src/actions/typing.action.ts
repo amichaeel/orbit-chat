@@ -1,9 +1,13 @@
 "use server";
 import { pusherServer } from "@/lib/pusher";
 
-export const sendTypingIndicator = async (isTyping: boolean, clientId: string) => {
+export const sendTypingIndicator = async (
+  isTyping: boolean,
+  clientId: string,
+  channelId: string
+) => {
   try {
-    await pusherServer.trigger("global", "typing-indicator", {
+    await pusherServer.trigger(`channel-${channelId}`, "typing-indicator", {
       isTyping,
       clientId
     });

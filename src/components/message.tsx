@@ -1,13 +1,21 @@
-import React from 'react'
-
-type Props = {
-  message: string
+interface MessageProps {
+  message: string;
+  timestamp: Date;
+  userId: string;
 }
 
-const Message = ({ message }: Props) => {
+const Message = ({ message, timestamp, userId }: MessageProps) => {
   return (
-    <div className='w-fit text-xs flex items-center rounded-lg rounded-tl-none text-white bg-black dark:bg-white dark:text-black py-2 px-4'>{message}</div>
-  )
-}
+    <div className="flex flex-col">
+      <div className="flex items-center gap-2">
+        <span className="text-sm font-medium">{userId}</span>
+        <span className="text-xs text-muted-foreground">
+          {timestamp.toLocaleTimeString()}
+        </span>
+      </div>
+      <p>{message}</p>
+    </div>
+  );
+};
 
-export default Message
+export default Message;
