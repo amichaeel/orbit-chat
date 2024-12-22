@@ -1,9 +1,14 @@
-// src/app/channel/[channel]/page.tsx
 import ChatContainer from "@/components/chat-container"
 import { db } from "@/lib/db"
 import { notFound } from "next/navigation"
 
-const ChannelPage = async ({ params }: { params: { channel: string } }) => {
+interface PageProps {
+  params: {
+    channel: string
+  }
+}
+
+async function ChannelPage({ params }: PageProps) {
   const channel = await db.channel.findUnique({
     where: { name: params.channel }
   })
