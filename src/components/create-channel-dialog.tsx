@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import Link from "next/link"
 import {
   Dialog,
   DialogContent,
@@ -28,6 +29,9 @@ import { z } from "zod"
 import { createChannel } from "@/actions/channel.action"
 import { Plus } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { useAuth } from "@/hooks/use-auth"
+import { useToast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast"
 
 const formSchema = z.object({
   name: z.string()
@@ -42,6 +46,8 @@ export function CreateChannelDialog() {
   const [open, setOpen] = useState(false)
   const router = useRouter()
   const [error, setError] = useState("")
+  const { user } = useAuth()
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -65,12 +71,32 @@ export function CreateChannelDialog() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline">
+      {user ? (
+        <DialogTrigger asChild>
+          <Button variant="outline" className="w-full">
+            <Plus className="mr-2 h-4 w-4" />
+            Create Channel
+          </Button>
+        </DialogTrigger>
+      ) : (
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={() => {
+            toast({
+              description: "Please login to create a channel",
+              action: (
+                <Link href="/login">
+                  <ToastAction altText="Login">Login</ToastAction>
+                </Link>
+              ),
+            })
+          }}
+        >
           <Plus className="mr-2 h-4 w-4" />
           Create Channel
         </Button>
-      </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Create Channel</DialogTitle>

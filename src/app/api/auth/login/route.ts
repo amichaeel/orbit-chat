@@ -22,15 +22,12 @@ export async function POST(request: NextRequest) {
       return new NextResponse("Invalid credentials", { status: 401 })
     }
 
-    // Verify password
     const isPasswordValid = await compare(password, user.password)
     if (!isPasswordValid) {
       return new NextResponse("Invalid credentials", { status: 401 })
     }
 
-    // Set cookie with user info (don't include password)
     (await
-      // Set cookie with user info (don't include password)
       cookies()).set('user', JSON.stringify({
         id: user.id,
         email: user.email,

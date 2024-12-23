@@ -1,4 +1,3 @@
-// app/api/auth/signup/route.ts
 import { db } from "@/lib/db"
 import { hash } from "bcryptjs"
 import { NextRequest, NextResponse } from "next/server"
@@ -15,7 +14,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { username, email, password } = signupSchema.parse(body)
 
-    // Check if username or email already exists
     const existingUser = await db.user.findFirst({
       where: {
         OR: [

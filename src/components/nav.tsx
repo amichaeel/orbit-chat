@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@/context/auth-context"
+import { useAuth } from "@/hooks/use-auth"
 import { CreateChannelDialog } from "./create-channel-dialog"
 
 
@@ -47,9 +47,6 @@ const Nav = () => {
       <div className="flex items-center ml-auto gap-2">
         {user ? (
           <>
-            <div className="hidden lg:block">
-              <CreateChannelDialog />
-            </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon">
@@ -57,9 +54,11 @@ const Nav = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                <div className="px-2 py-1.5">
-                  <p className="text-sm font-medium">{user.username || 'User'}</p>
-                  <p className="text-xs text-muted-foreground">{user.email}</p>
+                <div className="hover:bg-muted-foreground/5 px-2 py-1.5 rounded-md">
+                  <Link href={`/user/${user.username}`} className="">
+                    <p className="text-sm font-medium">{user.username || 'User'}</p>
+                    <p className="text-xs text-muted-foreground">{user.email}</p>
+                  </Link>
                 </div>
                 <DropdownMenuSeparator />
                 <div className="lg:hidden">
@@ -87,7 +86,7 @@ const Nav = () => {
         )}
         <ThemeToggle />
       </div>
-    </div>
+    </div >
   )
 }
 

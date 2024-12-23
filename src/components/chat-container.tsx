@@ -1,8 +1,9 @@
 "use client";
 import React, { useEffect, useState, useRef } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import Link from "next/link";
 import Message from "./message";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Send } from "lucide-react";
@@ -11,13 +12,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { sendMessage } from "@/actions/message.action";
 import { sendTypingIndicator } from "@/actions/typing.action";
 import { getChannelMessages } from "@/actions/channel.action";
-
+import { useToast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast"
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
 } from "@/components/ui/form"
+import { useAuth } from "@/hooks/use-auth";
 
 interface Message {
   id: string;
@@ -47,9 +50,10 @@ const ChatContainer = ({ channel }: ChatContainerProps) => {
   const [typingUser, setTypingUser] = useState<string | null>(null);
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout>();
   const [isCurrentlyTyping, setIsCurrentlyTyping] = useState(false);
-  const [user, setUser] = useState<{ id: string; username: string } | null>(null);
   const [clientId] = useState(() => Math.random().toString(36).substr(2, 9));
   const chatEndRef = useRef<HTMLDivElement | null>(null);
+  const { user } = useAuth();
+  const { toast } = useToast();
 
   const uniqueMessages = messages.filter((message, index, self) =>
     index === self.findIndex((m) => m.id === message.id)
@@ -74,8 +78,8 @@ const ChatContainer = ({ channel }: ChatContainerProps) => {
     if (!values.message.trim() || !user) return;
 
     try {
-      await sendMessage(values.message, channel, user);
-      await sendTypingIndicator(false, clientId, channel, user.username);
+      await sendMessage(values.message, channel, { id: user.id, username: user.username! });
+      await sendTypingIndicator(false, clientId, channel, user.username!);
       setIsCurrentlyTyping(false);
       form.reset();
     } catch (error) {
@@ -87,14 +91,14 @@ const ChatContainer = ({ channel }: ChatContainerProps) => {
     if (isCurrentlyTyping || !user) return;
 
     setIsCurrentlyTyping(true);
-    await sendTypingIndicator(true, clientId, channel, user.username);
+    await sendTypingIndicator(true, clientId, channel, user.username!);
 
     if (typingTimeout) {
       clearTimeout(typingTimeout);
     }
 
     const timeout = setTimeout(async () => {
-      await sendTypingIndicator(false, clientId, channel, user.username);
+      await sendTypingIndicator(false, clientId, channel, user.username!);
       setIsCurrentlyTyping(false);
     }, TYPING_TIMEOUT);
 
@@ -113,22 +117,6 @@ const ChatContainer = ({ channel }: ChatContainerProps) => {
 
     loadMessages();
   }, [channel]);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await fetch('/api/auth/me');
-        if (response.ok) {
-          const userData = await response.json();
-          setUser(userData);
-        }
-      } catch (error) {
-        console.error('Failed to fetch user:', error);
-      }
-    };
-
-    fetchUser();
-  }, []);
 
   useEffect(() => {
     const channelName = `channel-${channel}`;
@@ -208,6 +196,7 @@ const ChatContainer = ({ channel }: ChatContainerProps) => {
                 <FormItem className="flex-1">
                   <FormControl>
                     <Input
+                      autoComplete="off"
                       placeholder="Say something..."
                       {...field}
                       onChange={(e) => {
@@ -220,7 +209,18 @@ const ChatContainer = ({ channel }: ChatContainerProps) => {
                 </FormItem>
               )}
             />
-            <Button type="submit" size="icon">
+            <Button type="submit" size="icon" onClick={() => {
+              if (!user) {
+                return toast({
+                  description: "Please login to send a message",
+                  action: (
+                    <Link href="/login">
+                      <ToastAction altText="Login">Login</ToastAction>
+                    </Link>
+                  ),
+                })
+              }
+            }}>
               <Send className="h-4 w-4" />
             </Button>
           </form>

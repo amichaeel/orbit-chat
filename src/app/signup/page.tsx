@@ -1,9 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
+import { useAuth } from "@/hooks/use-auth"
+import Loading from "../loading"
 import Link from "next/link"
 
 export default function SignupPage() {
@@ -11,27 +13,27 @@ export default function SignupPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
+  const { user, signup, loading } = useAuth()
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
     try {
-      const res = await fetch('/api/auth/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email, password }),
-      })
-
-      if (!res.ok) {
-        const error = await res.text()
-        throw new Error(error)
-      }
-
-      router.push('/login')
+      await signup(email, password, username);
+      router.push('/login');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
     }
+  }
+
+  useEffect(() => {
+    if (user) {
+      router.push("/");
+    }
+  }, [user, router])
+
+  if (loading) {
+    return <Loading />
   }
 
   return (

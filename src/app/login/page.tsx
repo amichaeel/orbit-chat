@@ -1,18 +1,19 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@/context/auth-context"
+import { useAuth } from "@/hooks/use-auth"
+import Loading from "../loading"
 import Link from "next/link"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
-  const { login } = useAuth()
+  const { user, login, loading } = useAuth()
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -23,6 +24,16 @@ export default function LoginPage() {
     } catch (err) {
       setError("Login failed. Please check your credentials.")
     }
+  }
+
+  useEffect(() => {
+    if (user) {
+      router.push("/");
+    }
+  }, [user, router])
+
+  if (loading) {
+    return <Loading />
   }
 
   return (

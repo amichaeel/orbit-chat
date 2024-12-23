@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 interface MessageProps {
   message: string;
   timestamp: Date;
@@ -8,7 +10,9 @@ const Message = ({ message, timestamp, username }: MessageProps) => {
   return (
     <div className="flex flex-col md:hover:bg-black/10 md:dark:hover:bg-white/5 py-4 px-4">
       <div className="flex items-baseline gap-2">
-        <span className="text-sm font-medium">{username}</span>
+        <Link href={`/user/${username}`}>
+          <span className="text-sm font-medium">{username}</span>
+        </Link>
         <span className="text-xs text-muted-foreground">
           {(() => {
             const now = new Date();

@@ -22,9 +22,9 @@ const ChannelPage = async ({ params }: ChannelPageProps) => {
   }
 
   return (
-    <div className="flex flex-col h-full overflow-hidden"> {/* Changed classes */}
+    <div className="flex flex-col h-full overflow-hidden">
       <ChannelHeader name={channel.name} description={channel.description} />
-      <div className="flex-1 overflow-hidden"> {/* Added wrapper */}
+      <div className="flex-1 overflow-hidden">
         <ChatContainer channel={channel.id} />
       </div>
     </div>

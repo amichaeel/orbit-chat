@@ -10,7 +10,7 @@ interface ChannelHeaderProps {
 }
 
 export const ChannelHeader = ({ name, description }: ChannelHeaderProps) => {
-  const [isExpanded, setIsExpanded] = useState(true)
+  const [isExpanded, setIsExpanded] = useState(false)
 
   return (
     <div className="border-b">
