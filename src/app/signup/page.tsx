@@ -7,22 +7,28 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/hooks/use-auth"
 import Loading from "../loading"
 import Link from "next/link"
+import ClipLoader from "react-spinners/ClipLoader";
+
 
 export default function SignupPage() {
   const [username, setUsername] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
   const { user, signup, loading } = useAuth()
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setIsLoading(true)
     try {
       await signup(email, password, username);
       router.push('/login');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -37,7 +43,7 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="flex flex-1 items-center justify-center">
       <div className="max-w-md w-full p-6 space-y-6">
         <div>
           <h1 className="text-2xl font-bold">Create an account</h1>
@@ -81,7 +87,11 @@ export default function SignupPage() {
           </div>
 
           <Button type="submit" className="w-full">
-            Sign up
+            {isLoading ? (
+              <ClipLoader size={20} className="spinner" />
+            ) : (
+              "Sign Up"
+            )}
           </Button>
         </form>
 

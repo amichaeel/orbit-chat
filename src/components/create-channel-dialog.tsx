@@ -32,6 +32,7 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/hooks/use-auth"
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast"
+import ClipLoader from "react-spinners/ClipLoader"
 
 const formSchema = z.object({
   name: z.string()
@@ -45,6 +46,7 @@ const formSchema = z.object({
 export function CreateChannelDialog() {
   const [open, setOpen] = useState(false)
   const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("")
   const { user } = useAuth()
   const { toast } = useToast();
@@ -58,6 +60,7 @@ export function CreateChannelDialog() {
   })
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setIsLoading(true)
     const result = await createChannel(values)
     if (result.success) {
       setOpen(false)
@@ -67,6 +70,7 @@ export function CreateChannelDialog() {
     } else {
       setError(result.error || "Failed to create channel")
     }
+    setIsLoading(false)
   }
 
   return (
@@ -154,7 +158,13 @@ export function CreateChannelDialog() {
               )}
             />
             <DialogFooter>
-              <Button type="submit">Create Channel</Button>
+              <Button type="submit" className="w-1/2">
+                {isLoading ? (
+                  <ClipLoader size={20} className="spinner" />
+                ) : (
+                  "Create Channel"
+                )}
+              </Button>
             </DialogFooter>
           </form>
         </Form>

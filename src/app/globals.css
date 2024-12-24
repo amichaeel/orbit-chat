@@ -4,58 +4,58 @@
 
 @layer base {
   :root {
-    --background: 240 67% 97%; /* Light celestial lavender */
-    --foreground: 230 15% 20%; /* Deep navy-gray */
-    --card: 240 60% 98%; /* Soft nebula white */
-    --card-foreground: 230 15% 20%; /* Deep navy-gray */
-    --popover: 240 65% 98%; /* Lavender mist */
-    --popover-foreground: 230 15% 20%; /* Deep navy-gray */
-    --primary: 260 45% 55%; /* Bright lavender */
-    --primary-foreground: 0 0% 100%; /* White */
-    --secondary: 200 40% 85%; /* Aqua teal */
-    --secondary-foreground: 230 15% 20%; /* Deep navy-gray */
-    --muted: 240 30% 95%; /* Pale lavender gray */
-    --muted-foreground: 230 20% 50%; /* Muted navy-gray */
-    --accent: 40 80% 65%; /* Sunrise peach */
-    --accent-foreground: 0 0% 98%; /* Soft white */
-    --destructive: 0 70% 60%; /* Warm coral red */
-    --destructive-foreground: 0 0% 98%; /* Soft white */
-    --border: 240 30% 90%; /* Soft blue-gray */
-    --input: 240 50% 96%; /* Misty lavender */
-    --ring: 260 45% 55%; /* Bright lavender */
-    --chart-1: 50 70% 60%; /* Solar yellow */
-    --chart-2: 160 50% 50%; /* Orbital green */
-    --chart-3: 220 40% 40%; /* Stellar teal */
-    --chart-4: 290 60% 65%; /* Cosmic violet */
-    --chart-5: 10 80% 70%; /* Rose glow */
+    --background: 220 30% 97%;
+    --foreground: 220 25% 20%;
+    --card: 220 25% 98%;
+    --card-foreground: 220 25% 20%;
+    --popover: 220 25% 98%;
+    --popover-foreground: 220 25% 20%;
+    --primary: 220 40% 45%;
+    --primary-foreground: 220 40% 98%;
+    --secondary: 220 20% 85%;
+    --secondary-foreground: 220 25% 20%;
+    --muted: 220 20% 93%;
+    --muted-foreground: 220 20% 45%;
+    --accent: 220 30% 75%;
+    --accent-foreground: 220 25% 20%;
+    --destructive: 0 60% 50%;
+    --destructive-foreground: 220 40% 98%;
+    --border: 220 25% 90%;
+    --input: 220 25% 95%;
+    --ring: 220 40% 45%;
+    --chart-1: 220 40% 45%;
+    --chart-2: 220 35% 55%;
+    --chart-3: 220 30% 65%;
+    --chart-4: 220 25% 75%;
+    --chart-5: 220 20% 85%;
     --radius: 0.5rem;
   }
 
   .dark {
-    --background: 240 20% 10%; /* Deep cosmos black */
-    --foreground: 0 0% 90%; /* Soft starlight */
-    --card: 240 25% 13%; /* Void purple */
-    --card-foreground: 0 0% 95%; /* Starlight white */
-    --popover: 240 20% 12%; /* Cosmic shadow */
-    --popover-foreground: 0 0% 90%; /* Starlight gray */
-    --primary: 270 50% 55%; /* Nova lavender */
-    --primary-foreground: 240 20% 10%; /* Cosmos black */
-    --secondary: 220 25% 25%; /* Meteor teal */
-    --secondary-foreground: 0 0% 90%; /* Soft starlight */
-    --muted: 220 20% 20%; /* Space gray */
-    --muted-foreground: 240 20% 75%; /* Muted starlight */
-    --accent: 330 60% 50%; /* Supernova magenta */
-    --accent-foreground: 240 20% 10%; /* Cosmos black */
-    --destructive: 0 50% 40%; /* Comet red */
-    --destructive-foreground: 0 0% 90%; /* Starlight white */
-    --border: 240 20% 18%; /* Orbit gray */
-    --input: 240 25% 20%; /* Lunar slate */
-    --ring: 270 50% 55%; /* Nova lavender */
-    --chart-1: 43 84% 61%; /* Solar yellow */
-    --chart-2: 200 50% 40%; /* Planetary green */
-    --chart-3: 220 40% 30%; /* Orbital blue */
-    --chart-4: 280 50% 50%; /* Pulsar purple */
-    --chart-5: 10 80% 60%; /* Cosmic rose */
+    --background: 220 10% 8%;
+    --foreground: 220 5% 85%;
+    --card: 220 8% 11%;
+    --card-foreground: 220 5% 85%;
+    --popover: 220 8% 11%;
+    --popover-foreground: 220 5% 85%;
+    --primary: 220 15% 45%;
+    --primary-foreground: 220 10% 8%;
+    --secondary: 220 10% 20%;
+    --secondary-foreground: 220 5% 85%;
+    --muted: 220 8% 15%;
+    --muted-foreground: 220 5% 65%;
+    --accent: 220 12% 30%;
+    --accent-foreground: 220 10% 8%;
+    --destructive: 0 30% 35%;
+    --destructive-foreground: 220 5% 85%;
+    --border: 220 8% 15%;
+    --input: 220 8% 18%;
+    --ring: 220 15% 45%;
+    --chart-1: 220 15% 45%;
+    --chart-2: 220 12% 35%;
+    --chart-3: 220 10% 25%;
+    --chart-4: 220 8% 20%;
+    --chart-5: 220 5% 15%;
   }
 }
 
@@ -67,4 +67,9 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.spinner {
+  border-color: hsl(var(--muted)) !important;
+  border-bottom-color: transparent !important;
 }

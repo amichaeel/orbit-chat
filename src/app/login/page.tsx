@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/hooks/use-auth"
+import ClipLoader from "react-spinners/ClipLoader";
 import Loading from "../loading"
 import Link from "next/link"
 
@@ -13,16 +14,20 @@ export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
+  const [isLoading, setIsLoading] = useState(false);
   const { user, login, loading } = useAuth()
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setIsLoading(true)
     try {
       await login(email, password)
       router.push('/')
     } catch (err) {
       setError("Login failed. Please check your credentials.")
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -37,10 +42,11 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="flex flex-1 items-center justify-center">
       <div className="max-w-md w-full p-6 space-y-6">
         <div>
-          <h1 className="text-2xl font-bold">Welcome back</h1>
+          <h1 className="text-2xl font-bold">Log In</h1>
+          <p className="text-muted-foreground">By continuing, you agree to our User Agreenment and acknowledge that you understand the Privacy Policy.</p>
         </div>
 
         {error && (
@@ -71,12 +77,16 @@ export default function LoginPage() {
           </div>
 
           <Button type="submit" className="w-full">
-            Log in
+            {isLoading ? (
+              <ClipLoader size={20} className="spinner" />
+            ) : (
+              "Log In"
+            )}
           </Button>
         </form>
 
         <p className="text-center text-sm">
-          Don&apos;t have an account?{" "}
+          New to Orbit?{" "}
           <Link href="/signup" className="text-primary hover:underline">
             Sign up
           </Link>

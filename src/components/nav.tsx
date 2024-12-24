@@ -1,25 +1,30 @@
 "use client"
 
-import { ThemeToggle } from "./theme-toggle"
 import { Button } from "./ui/button"
 import Search from "./search"
-import { LogOut, User } from "lucide-react"
+import { Moon, Sun, LogOut, Settings, MessageCircleMore, Bell } from "lucide-react"
 import Link from "next/link"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/hooks/use-auth"
-import { CreateChannelDialog } from "./create-channel-dialog"
+import { useTheme } from "next-themes"
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar"
 
 
 const Nav = () => {
   const router = useRouter()
   const { user, logout } = useAuth()
+  const { setTheme, theme } = useTheme()
 
   const handleLogout = async () => {
     try {
@@ -44,26 +49,47 @@ const Nav = () => {
         </div>
       </div>
 
-      <div className="flex items-center ml-auto gap-2">
+      <div className="flex items-center ml-auto gap-4">
         {user ? (
           <>
+            <Button disabled variant={"ghost"} className="h-8 w-8">
+              <MessageCircleMore strokeWidth={1.5} />
+            </Button>
+            <Button disabled variant={"ghost"} className="h-8 w-8">
+              <Bell strokeWidth={1.5} />
+            </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <User className="h-5 w-5" />
-                </Button>
+                <Avatar className='h-8 w-8 cursor-pointer'>
+                  <AvatarImage src="https://github.com/shadcn.png" />
+                  <AvatarFallback>CN</AvatarFallback>
+                </Avatar>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <div className="hover:bg-muted-foreground/5 px-2 py-1.5 rounded-md">
-                  <Link href={`/user/${user.username}`} className="">
-                    <p className="text-sm font-medium">{user.username || 'User'}</p>
-                    <p className="text-xs text-muted-foreground">{user.email}</p>
-                  </Link>
-                </div>
+              <DropdownMenuContent align="end" className="w-96">
+                <Link href={`/user/${user.username}`} className="flex gap-2 hover:bg-muted-foreground/5 px-2 py-1.5 rounded-md">
+                  <Avatar className='h-8 w-8 cursor-pointer'>
+                    <AvatarImage src="https://github.com/shadcn.png" />
+                    <AvatarFallback>CN</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="text-sm font-medium">View Profile</p>
+                    <p className="text-xs text-muted-foreground">@{user.username}</p>
+                  </div>
+                </Link>
                 <DropdownMenuSeparator />
-                <div className="lg:hidden">
-                  <CreateChannelDialog />
-                </div>
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+                >
+                  <Sun className="hidden h-4 w-4 mr-2 dark:block" />
+                  <Moon className="h-4 mr-2 w-4 dark:hidden" />
+                  {theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+                </DropdownMenuItem>
+                <DropdownMenuItem disabled>
+                  <Settings className="w-4 h-4 mr-2" />
+                  Settings
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="text-red-600 cursor-pointer"
                   onClick={handleLogout}
@@ -76,15 +102,14 @@ const Nav = () => {
           </>
         ) : (
           <div className="flex items-center gap-2">
-            <Button variant="ghost" asChild>
+            <Button variant="outline" asChild>
               <Link href="/login">Log in</Link>
             </Button>
-            <Button asChild>
+            <Button variant="secondary" asChild>
               <Link href="/signup">Sign up</Link>
             </Button>
           </div>
         )}
-        <ThemeToggle />
       </div>
     </div >
   )
