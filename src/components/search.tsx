@@ -95,7 +95,7 @@ const Search = () => {
           onChange={(e) => onInputChange(e.target.value)}
           onFocus={onFocus}
         />
-        <span className="absolute text-xs right-6 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/50">⌘J</span>
+        <span className="md:inline hidden absolute text-xs right-6 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/50">⌘J</span>
       </div>
 
       {open && (
