@@ -36,6 +36,21 @@ const Search = () => {
   }
 
   useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'j') {
+        event.preventDefault()
+        inputRef.current?.focus()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [])
+
+  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         dropdownRef.current &&
@@ -70,16 +85,17 @@ const Search = () => {
 
   return (
     <div className="relative w-full max-w-xl">
-      <div className="relative">
+      <div className="relative flex items-center">
         <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           ref={inputRef}
           placeholder="Search channels..."
-          className="pl-9 rounded-full"
+          className="pl-9 pr-12 rounded-full"
           value={value}
           onChange={(e) => onInputChange(e.target.value)}
           onFocus={onFocus}
         />
+        <span className="absolute text-xs right-6 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/50">⌘J</span>
       </div>
 
       {open && (
